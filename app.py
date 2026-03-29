@@ -220,3 +220,28 @@ st.info("""
 - Loss prediction remains challenging due to market noise  
 """)
 
+import joblib
+
+@st.cache_resource
+def load_model():
+    model = joblib.load("model.pkl")
+    features = joblib.load("features.pkl")
+    return model, features
+
+model, features = load_model()
+
+st.markdown("## 🔮 Predict Profitability")
+
+input_data = {}
+
+for col in features:
+    input_data[col] = st.number_input(f"{col}", value=0.0)
+
+if st.button("Predict"):
+    df = pd.DataFrame([input_data])
+    pred = model.predict(df)[0]
+    
+    if pred == 1:
+        st.success("✅ Profitable Trade Expected")
+    else:
+        st.error("❌ Not Profitable")
